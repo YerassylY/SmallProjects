@@ -4,17 +4,6 @@ import java.math.BigDecimal;
 
 public class NumberToTextConverter {
 
-    public static void main(String argv[]) {
-        Long number = 2323153309121L;
-        String s = convertToKaz(BigDecimal.valueOf(number));
-
-        Long n = 7455881921L;
-        System.out.println(convertToRus(n));
-
-        Long eng = 87L;
-        System.out.println(convertToEnglish(eng));
-    }
-
     private static final String[] kazOnes = {
             "",
             "бір",
@@ -90,7 +79,7 @@ public class NumberToTextConverter {
             "девятьсот"
     };
 
-    private static final String[] engslihOnes = {
+    private static final String[] englishOnes = {
             "",
             "one",
             "two",
@@ -126,7 +115,18 @@ public class NumberToTextConverter {
             "ninety",  //9
     };
 
-    public static String convertToKaz(BigDecimal number) {
+    public static void main(String argv[]) {
+        Long nKaz = 4127451241621789L;
+        System.out.println(convertToKaz(nKaz));
+
+        Long nRus = 12222221131121L;
+        System.out.println(convertToRus(nRus));
+
+        Long nEng = 999999999999999L;
+        System.out.println(convertToEnglish(nEng));
+    }
+
+    public static String convertToKazOld(BigDecimal number) {
 
         long value = number.longValue();
 
@@ -200,46 +200,71 @@ public class NumberToTextConverter {
         return result;
     }
 
-    public static String convertToRus(long number) {
+    public static String convertToKaz(long number) {
+        if (number < 10) {
+            return kazOnes[(int) number];
+        } else if (number < 100) {
+            return kazTenth[(int) (number / 10)] + " " + convertToKaz(number % 10);
+        } else if (number < 1000) {
+            return convertToKaz(number / 100) + " жүз " + convertToKaz(number % 100);
+        } else if (number < 1000000) {
+            return convertToKaz(number / 1000) + " мың " + convertToKaz(number % 1000);
+        } else if (number < 1000000000) {
+            return convertToKaz(number / 1000000) + " миллион " + convertToKaz(number % 1000000);
+        } else if (number < 1000000000000L) {
+            return convertToKaz(number / 1000000000) + " миллиард " + convertToKaz(number % 1000000000);
+        } else if (number < 1000000000000000L) {
+            return convertToKaz(number / 1000000000000L) + " триллиона " + convertToKaz(number % 1000000000000L);
+        } else return "Works till trillions, can be enlarged if it is required";
+    }
 
+    public static String convertToRus(long number) {
+        // TODO: correct Склонение
         if (number < 20) {
             return rusOnes[(int) number];
-        }
-
-        if (number < 100) {
+        } else if (number < 100) {
             return rusTenth[(int) (number / 10)] + " " + convertToRus(number % 10);
-        }
-
-        if (number < 1000) {
+        } else if (number < 1000) {
             return rusHundreds[(int) (number / 100)] + " " + convertToRus(number % 100);
-        }
+        } else if (number < 1000000) {
 
-        if (number < 10000) {
-            return rusOnes[(int) (number / 1000)] + " тысяча " + convertToRus(number % 1000);
-        }
+            int thousand = (int) (number / Math.pow(10, String.valueOf(number).length() - 1));
 
-        if (number < 100000) {
-            return rusTenth[(int) (number / 10000)] + " " + convertToRus(number % 10000);
-        }
+            switch (thousand) {
+                case (1):
+                    return convertToRus((int) (number / 1000)) + " тысяча " + convertToRus(number % 1000);
+                case (2):
+                case (3):
+                case (4):
+                    return convertToRus((int) (number / 1000)) + " тысячи " + convertToRus(number % 1000);
+                default:
+                    return convertToRus((int) (number / 1000)) + " тысяч " + convertToRus(number % 1000);
+            }
 
-        if (number < 1000000) {
-            return rusHundreds[(int) (number / 100000)] + " " + convertToRus(number % 100000);
-        }
-
-        if (number < 1000000000) {
-            return convertToRus(number / 1000000) + " миллионов " + convertToRus(number % 1000000);
-        }
-
-        return convertToRus(number / 1000000000) + " миллиардов " + convertToRus(number % 1000000000);
+        } else if (number < 1000000000) {
+            return convertToRus(number / 1000000) + " миллион  " + convertToRus(number % 1000000);
+        } else if (number < 1000000000000L) {
+            return convertToRus(number / 1000000000) + " миллиарда " + convertToRus(number % 1000000000);
+        } else if (number < 1000000000000000L) {
+            return convertToRus(number / 1000000000000L) + " триллиона " + convertToRus(number % 1000000000000L);
+        } else return "Works till trillions, can be enlarged if it is required";
     }
 
     public static String convertToEnglish(long number) {
-        String result = "";
-
         if (number < 20) {
-            return result += engslihOnes[((int) number)];
+            return englishOnes[(int) number];
         } else if (number < 100) {
-            return result += englishTenth[((int) number)] + convertToEnglish(number % 10);
-        } else return result;
+            return englishTenth[(int) (number / 10)] + "-" + convertToEnglish(number % 10);
+        } else if (number < 1000) {
+            return convertToEnglish(number / 100) + " hundred " + convertToEnglish(number % 100);
+        } else if (number < 1000000) {
+            return convertToEnglish(number / 1000) + " thousand " + convertToEnglish(number % 1000);
+        } else if (number < 1000000000) {
+            return convertToEnglish(number / 1000000) + " million " + convertToEnglish(number % 1000000);
+        } else if (number < 1000000000000L) {
+            return convertToEnglish(number / 1000000000) + " billion " + convertToEnglish(number % 1000000000);
+        } else if (number < 1000000000000000L) {
+            return convertToEnglish(number / 1000000000000L) + " trillion " + convertToEnglish(number % 1000000000000L);
+        } else return "Works till trillions, can be enlarged if it is required";
     }
 }
